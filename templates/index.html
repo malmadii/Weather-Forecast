@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Weather Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="greeting">{{ greeting }}, Mona!</h1>
+    <div class="search">
+      <input id="city-input" placeholder="Search city..." />
+      <button id="go-btn">Go</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="current bubble-card">
+      <div>Flask is running ✅ — we’ll add real weather next.</div>
+    </section>
+
+    <section class="week" id="week"></section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
