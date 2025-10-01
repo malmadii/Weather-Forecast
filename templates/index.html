@@ -8,15 +8,19 @@
 </head>
 <body>
   <header class="topbar">
-    <h1 id="greeting">Good Morning, Mona!</h1>
+    <h1 id="greeting">Hello, Friend!</h1>
+
     <div class="search">
-      <input id="city-input" placeholder="Search city..." />
+      <input id="name-input" placeholder="Your name..." />
+      <button id="save-name">Save</button>
+
+      <input id="city-input" placeholder="Search city..." value="Madrid" />
       <button id="go-btn">Go</button>
     </div>
   </header>
 
   <main class="container">
-    <!-- CURRENT CARD -->
+    <!-- Current -->
     <section class="current bubble-card">
       <div class="current-left">
         <h2 id="city-name">--</h2>
@@ -28,12 +32,10 @@
       </div>
     </section>
 
-    <!-- WEEK GRID (we'll fill later) -->
+    <!-- 7-day bubbles -->
     <section class="week" id="week"></section>
   </main>
 
-  <!-- put scripts at the very end so DOM exists -->
-  <script>console.log("inline script alive");</script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
