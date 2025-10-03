@@ -76,6 +76,7 @@ function renderWeek(daily){
   });
 }
 
+
 async function render(city){
   try{
     const place = await geocode(city);
@@ -108,15 +109,41 @@ async function saveLastCity(city){
 
 // --- Greeting (personalized, saved locally) ---
 function setGreeting(){
-  const saved = localStorage.getItem("user_name") || document.getElementById("name-input").value || "Friend";
+  const saved = localStorage.getItem("user_name") || document.getElementById("name-input")?.value || "Friend";
   const h = new Date().getHours();
   const part = h<12 ? "Good Morning" : h<18 ? "Good Afternoon" : "Good Evening";
   document.getElementById("greeting").textContent = `${part}, ${saved}!`;
+
+  // hide the name input once we have a saved name
+  const hasName = !!localStorage.getItem("user_name");
+  toggleNameControls(!hasName);
 }
+
+// --- Name controls (show/hide) ---
+function toggleNameControls(show){
+  const box = document.getElementById("name-controls");
+  if(!box) return;
+  box.style.display = show ? "flex" : "none";
+}
+
 document.getElementById("save-name").addEventListener("click", ()=>{
   const v = document.getElementById("name-input").value.trim();
-  if(v){ localStorage.setItem("user_name", v); setGreeting(); }
+  if(v){
+    localStorage.setItem("user_name", v);
+    setGreeting();           // will hide the controls now
+  }
 });
+
+document.getElementById("greeting").addEventListener("click", ()=>{
+  // current name is whatever is saved or inferred from the greeting
+  const saved = localStorage.getItem("user_name") || "Friend";
+  const newName = prompt("Update your name:", saved);
+  if(newName && newName.trim()){
+    localStorage.setItem("user_name", newName.trim());
+    setGreeting(); // will update greeting and keep inputs hidden
+  }
+});
+
 
 // --- Search handlers (UPDATED) ---
 document.getElementById("go-btn").addEventListener("click", async ()=>{
