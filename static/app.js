@@ -87,6 +87,25 @@ async function render(city){
   }
 }
 
+// ---- persistence helpers (already in your code) ----
+async function loadLastCity(){
+  try{
+    const r = await fetch("/api/last-city");
+    const j = await r.json();
+    return j.last_city || "Madrid";
+  }catch{ return "Madrid"; }
+}
+
+async function saveLastCity(city){
+  try{
+    await fetch("/api/last-city", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ last_city: city })
+    });
+  }catch(e){ /* ignore for now */ }
+}
+
 // --- Greeting (personalized, saved locally) ---
 function setGreeting(){
   const saved = localStorage.getItem("user_name") || document.getElementById("name-input").value || "Friend";
@@ -99,15 +118,20 @@ document.getElementById("save-name").addEventListener("click", ()=>{
   if(v){ localStorage.setItem("user_name", v); setGreeting(); }
 });
 
-// --- Search handlers ---
-document.getElementById("go-btn").addEventListener("click", ()=>{
+// --- Search handlers (UPDATED) ---
+document.getElementById("go-btn").addEventListener("click", async ()=>{
   const c = document.getElementById("city-input").value.trim() || "Madrid";
-  render(c);
+  await render(c);
+  saveLastCity(c); // persist AFTER a successful render
 });
 document.getElementById("city-input").addEventListener("keydown", (e)=>{
   if(e.key==="Enter") document.getElementById("go-btn").click();
 });
 
-// --- Boot ---
-setGreeting();
-render(document.getElementById("city-input").value || "Madrid");
+// --- Boot (UPDATED) ---
+(async () => {
+  setGreeting();
+  const startCity = await loadLastCity();                  // read from Flask persistence
+  document.getElementById("city-input").value = startCity; // prefill input
+  await render(startCity);                                  // render that city on load
+})();
