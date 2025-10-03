@@ -7,17 +7,20 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <header class="topbar">
-    <h1 id="greeting">Hello, Friend!</h1>
+<header class="topbar">
+  <h1 id="greeting" title="Click to edit your name" style="cursor:pointer;">Hello, Friend!</h1>
 
-    <div class="search">
+  <div class="search">
+    <div id="name-controls">
       <input id="name-input" placeholder="Your name..." />
       <button id="save-name">Save</button>
-
-      <input id="city-input" placeholder="Search city..." value="Madrid" />
-      <button id="go-btn">Go</button>
     </div>
-  </header>
+
+    <input id="city-input" placeholder="Search city..." value="Madrid" />
+    <button id="go-btn">Go</button>
+  </div>
+</header>
+
 
   <main class="container">
     <!-- Current -->
