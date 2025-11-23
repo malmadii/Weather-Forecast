@@ -3,7 +3,7 @@ name: CI - Weather Dashboard
 on:
   push:
     branches:
-      - "**"      # run on every branch
+      - "**"
   pull_request:
 
 jobs:
@@ -23,12 +23,17 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest pytest-cov
+        pip install pytest pytest-cov prometheus-client
+
+    - name: Fix PYTHONPATH
+      # IMPORTANT: override it, do NOT append
+      run: |
+        echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
 
     - name: Run tests with coverage
       run: |
-        export PYTHONPATH=$PYTHONPATH:$(pwd)
-        pytest --maxfail=1 --disable-warnings --cov=app --cov-report=xml --cov-report=term-missing --cov-fail-under=70
+        pytest --maxfail=1 --disable-warnings \
+        --cov=app --cov-report=xml --cov-report=term-missing --cov-fail-under=70
 
     - name: Upload coverage report
       uses: actions/upload-artifact@v4
