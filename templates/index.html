@@ -2,43 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Weather Dashboard</title>
+
+  <!-- SEO / description (good practice for deployment) -->
+  <meta name="description" content="A clean and responsive Weather Dashboard built with Flask and modern JavaScript." />
+
+  <!-- Theme color for mobile browsers -->
+  <meta name="theme-color" content="#6a5acd">
+
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-<header class="topbar">
-  <h1 id="greeting" title="Click to edit your name" style="cursor:pointer;">Hello, Friend!</h1>
+  <!-- ===========================
+       HEADER / SEARCH AREA
+  ============================ -->
+  <header class="topbar" role="banner">
+    
+    <!-- Greeting text (dynamic) -->
+    <h1 id="greeting" title="Click to edit your name" class="clickable">
+      Hello, Friend!
+    </h1>
 
-  <div class="search">
-    <div id="name-controls">
-      <input id="name-input" placeholder="Your name..." />
-      <button id="save-name">Save</button>
+    <div class="search" role="search">
+      
+      <!-- Name controls (toggle shown via JS) -->
+      <div id="name-controls">
+        <label for="name-input" class="sr-only">Your name</label>
+        <input id="name-input" placeholder="Your name..." aria-label="Enter your name">
+        <button id="save-name">Save</button>
+      </div>
+
+      <!-- City search -->
+      <label for="city-input" class="sr-only">City input</label>
+      <input id="city-input" placeholder="Search city..." value="Madrid" aria-label="Search for a city">
+      <button id="go-btn">Go</button>
     </div>
-
-    <input id="city-input" placeholder="Search city..." value="Madrid" />
-    <button id="go-btn">Go</button>
-  </div>
-</header>
+  </header>
 
 
-  <main class="container">
-    <!-- Current -->
-    <section class="current bubble-card">
+  <!-- ===========================
+        MAIN CONTENT
+  ============================ -->
+  <main class="container" role="main">
+
+    <!-- Current weather card -->
+    <section class="current bubble-card" aria-labelledby="city-name">
       <div class="current-left">
         <h2 id="city-name">--</h2>
-        <div id="current-desc">--</div>
+        <p id="current-desc">--</p>
       </div>
+
       <div class="current-right">
         <div id="temp" class="temp">--°C</div>
-        <img id="icon" alt="icon" />
+        <img id="icon" alt="Weather icon">
       </div>
     </section>
 
-    <!-- 7-day bubbles -->
-    <section class="week" id="week"></section>
+
+    <!-- 7-day forecast -->
+    <section class="week" id="week" aria-label="7-day weather forecast">
+      <!-- JS inserts day cards here -->
+    </section>
+
   </main>
 
+  <!-- JavaScript -->
   <script src="{{ url_for('static', filename='app.js') }}"></script>
+
 </body>
 </html>
