@@ -35,4 +35,4 @@ HEALTHCHECK --interval=30s --timeout=3s \
 # ===========================
 # 6) Start command (Gunicorn)
 # ===========================
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:create_app()"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "--factory", "app:create_app"]
