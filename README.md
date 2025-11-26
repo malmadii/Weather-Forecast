@@ -6,7 +6,7 @@ Now also remembers your last searched city via a tiny REST endpoint and data.jso
 # Features
 
 1) Current weather: temperature, condition text, icon
-
+---
 2) 7-day forecast as hoverable bubbles (weekday, day & night temps, icon)
 
 3) City search input
@@ -136,3 +136,4 @@ Light/dark theme toggle
 Tests (unit/integration/UI), Dockerfile, GitHub Actions CI
 
 Optional switch to OpenWeather (proxy via Flask + .env secret)
+
