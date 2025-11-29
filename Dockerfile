@@ -1,38 +1,24 @@
-# ===========================
-# 1) Base Image
-# ===========================
 FROM python:3.11-slim
 
-# Set working directory inside the container
+# Install curl for healthcheck (optional but recommended)
+RUN apt-get update && apt-get install -y curl
+
 WORKDIR /app
 
-# ===========================
-# 2) Install dependencies
-# ===========================
+# Install dependencies
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Install gunicorn (production WSGI server)
 RUN pip install gunicorn
 
-# ===========================
-# 3) Copy application code
-# ===========================
+# Copy application code
 COPY . .
 
-# ===========================
-# 4) Expose Flask port
-# ===========================
-EXPOSE 5000
+# Azure expects port 8000
+EXPOSE 8000
 
-# ===========================
-# 5) Healthcheck (professor requires it)
-# ===========================
+# Healthcheck using curl
 HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl --fail http://localhost:5000/health || exit 1
+  CMD curl --fail http://localhost:8000/health || exit 1
 
-# ===========================
-# 6) Start command (Gunicorn)
-# ===========================
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "--factory", "app:create_app"]
+# Start gunicorn on port 8000, using app.factory
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--factory", "app:create_app"]
