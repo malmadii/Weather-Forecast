@@ -1,139 +1,199 @@
 # Weather Dashboard
 
-A minimal, futuristic weather web app showing current conditions and a 7-day forecast for any city. Clean “bubble” UI with hover effects, a personalized greeting, and no API key (uses Open-Meteo).
-Now also remembers your last searched city via a tiny REST endpoint and data.json.
+A lightweight weather web application that displays the current weather and a 7-day forecast for any city.  
+The project is built with Flask (using an application factory + blueprints) and a simple HTML/CSS/JS frontend.  
+Weather data is fetched from Open-Meteo, which requires no API key.  
+
+The application is fully containerized with Docker and deployed to Azure App Service using an automated CI/CD pipeline powered by GitHub Actions.
+
+**Live App Deployment:**  
+https://weather-dashboard-mona-cva6eagagxacatek.westeurope-01.azurewebsites.net/
+
+**Metrics** 
+https://weather-dashboard-mona-cva6eagagxacatek.westeurope-01.azurewebsites.net/metrics 
+
 
 # Features
 
-1) Current weather: temperature, condition text, icon
+- Current weather: temperature, condition description, icon
+- 7-day forecast displayed as interactive bubble cards
+- City search with basic error handling
+- Personalized greeting stored in localStorage
+- Persistent “last searched city” stored in `data.json` via Flask
+- `/health` endpoint for container ready checks
+- `/metrics` endpoint exposing Prometheus metrics directly from Flask
+
 ---
-2) 7-day forecast as hoverable bubbles (weekday, day & night temps, icon)
 
-3) City search input
+# Tech Stack
 
-4) Personalized greeting (“Good morning/afternoon/evening, your name”) saved in the browser (localStorage)
+**Frontend:**  
+- HTML  
+- CSS  
+- Vanilla JavaScript  
 
-5) Persistence: remembers the last searched city across page reloads (file-based via Flask)
+**Backend:**  
+- Python Flask  
+- Blueprints  
+- Application factory (`create_app()`)  
 
- # Tech Stack
+**APIs:**  
+- Open-Meteo Geocoding  
+- Open-Meteo Forecast  
 
-Frontend: HTML, CSS, Vanilla JS
+**DevOps:**  
+- GitHub Actions (CI + CD)  
+- Docker  
+- Azure Web App for Containers  
+- Prometheus client library for metrics
 
-Server: Python Flask (serves the page + tiny REST endpoint)
+---
 
-Weather Data: Open-Meteo Geocoding & Forecast (no API key)
+# Local Development
 
-# Quick Start
-# 1) clone
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
+### 1. Clone
 
-# 2) (Windows + Git Bash) create & activate venv
+```bash
+git clone https://github.com/malmadii/Weather-Forecast.git
+cd Weather-Forecast
+
+### 2) Create & activate virtual environment (Windows + Git Bash)
+
+```bash
 python -m venv venv
 source venv/Scripts/activate
 
-# 3) install & run
+
+### 3) Install dependencies & run the server
+
+```bash
 pip install -r requirements.txt
 python app.py
-# open http://127.0.0.1:5000/
+
+### 4) Open in browser
+http://127.0.0.1:5000/
 
 
-Tip: After editing HTML/CSS/JS, Ctrl+F5 (hard refresh) to see changes.
+##Project Structure
+app/
+  __init__.py           # Flask application factory
+  routes.py             # UI + /api/last-city
+  persistence.py        # JSON-based storage
+  monitoring.py         # /health + /metrics (Prometheus)
 
-# Project Structure
-app.py                  # Flask server (serves UI + /api/last-city)
-requirements.txt
-data.json               # simple persistence: { "last_city": "..." }
+tests/
+  test_routes.py
+  test_persistence.py
+  test_health.py
+
 templates/
-  └─ index.html         # UI markup
+  index.html
+
 static/
-  ├─ style.css          # minimal/futuristic styling + hover
-  └─ app.js             # Open-Meteo fetches + render + persistence calls
+  style.css
+  app.js
+
+Dockerfile
+ci.yml                  # CI workflow
+cd.yml                  # CD workflow
+requirements.txt
+data.json
+app.py                  # Local entrypoint
 
 # How It Works
-Frontend (no keys needed)
 
-User enters a city → app.js:
+### Frontend (no API keys required)
 
-Geocodes city via Open-Meteo
+`app.js` handles:
 
-Fetches current + 7-day forecast
+- city search  
+- geocoding → coordinates  
+- fetching 7-day + current forecast  
+- rendering weather cards  
+- storing greeting in `localStorage`  
+- saving last city via POST to Flask  
 
-Renders a current card and 7 day bubbles
+---
 
-Personalized greeting is stored in localStorage.
+### Backend
 
-After a successful search, the city is saved via a small REST call to Flask.
+`routes.py` exposes:
 
-Persistence (new)
+- `GET /api/last-city` → retrieves last stored city  
+- `POST /api/last-city` → saves the new one  
+- `GET /` → serves the frontend  
 
-GET /api/last-city → returns { "last_city": "<city>" } (from data.json)
+---
 
-POST /api/last-city with { "last_city": "<city>" } → updates data.json
+### Persistence
 
-On page load, the UI loads the last city and renders it automatically.
+`persistence.py` reads/writes from `data.json`.  
+During tests, the file path is overridden using environment variables so that real user data is never modified.
 
-# Endpoints (for reference)
+---
 
-GET / — serves the app (index.html)
+# Monitoring & Prometheus Metrics
 
-GET /api/last-city — returns the last saved city
+### Health Check: `/health`
 
-POST /api/last-city — saves { "last_city": "Paris" }
+Flask returns a simple status and uptime value:
 
-# Architecture
-Browser (HTML/CSS/JS)
-  ├─ City input + Greeting (localStorage)
-  ├─ Fetch Open-Meteo Geocoding
-  └─ Fetch Open-Meteo Forecast (current + daily)
-          │
-          ▼
-   Open-Meteo APIs (no key)
+```json
+{ "status": "ok", "uptime": 14.52 }
 
-Flask (app.py)
-  ├─ serves index.html, CSS, JS
-  └─ /api/last-city (GET/POST) -> data.json
+### Used by:
 
-# Manual Test Checklist
+- Docker `HEALTHCHECK`
+- Azure startup checks
 
-Search a valid city → current card + 7 bubbles appear quickly
+---
 
-Hover a bubble → slight enlarge animation
+### Prometheus Metrics: `/metrics`
 
-Misspell a city → friendly error alert
+The complete Prometheus setup is implemented in `monitoring.py` and includes:
 
-Change your name → greeting updates & persists
+- **weather_app_requests_total** — total request count  
+- **weather_app_request_latency_seconds** — request latency histogram  
+- **weather_app_errors_total** — 4xx/5xx error counter  
 
-Refresh the page → last searched city loads automatically
+Every request is automatically tracked through Flask’s  
+`before_app_request` and `after_app_request` hooks.
 
-# Troubleshooting
+No additional setup is required.  
+To view metrics, open:
 
-Blank UI / -- values: open DevTools → Network; verify requests to geocoding-api.open-meteo.com and api.open-meteo.com return 200.
+https://weather-dashboard-mona-cva6eagagxacatek.westeurope-01.azurewebsites.net/metrics
 
-City not found: try a different spelling (“New York”, “São Paulo”).
 
-Persistence not working: check GET /api/last-city in the browser; ensure data.json exists and is writable.
+Prometheus-formatted metrics will be displayed.
 
-# Configuration & Git Hygiene
 
-No API keys required.
-.gitignore:
+# Testing
 
-venv/
-.venv/
-__pycache__/
-*.pyc
-.env
+Run all tests:
 
-# Roadmap (next steps)
+```bash
+pytest -q
 
-Loading states & inline error toasts
 
-“Use my location” (geolocation + reverse geocode via server proxy)
+## Troubleshooting
 
-Light/dark theme toggle
+App won’t start on Azure:
 
-Tests (unit/integration/UI), Dockerfile, GitHub Actions CI
+- ensure container binds to port 8000
 
-Optional switch to OpenWeather (proxy via Flask + .env secret)
+- check Azure “Log Stream” for runtime errors
 
+- confirm create_app() exists and all blueprints register correctly
+
+Metrics not showing:
+
+- check /health to confirm the container is running
+
+- restart the app from Azure Portal
+
+Persistence issues:
+
+- verify data.json exists and is writable
+
+- inspect GET/POST requests in browser DevTools
